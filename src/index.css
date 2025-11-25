@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* small custom styles to match the screenshot */
+.app-bg { background: #f6f8fa; }
+.card { @apply bg-white rounded-lg shadow-md; }
+.brand { color: #d83a7a; } /* you can adjust */
+
+
+
+
+/* Hide everything except the print page */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  #print-area, #print-area * {
+    visibility: visible !important;
+  }
+
+  /* Ensure print area is at top-left */
+  #print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
