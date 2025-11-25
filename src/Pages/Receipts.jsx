@@ -80,7 +80,7 @@ function Receipts() {
           <button
             key={cat}
             onClick={() => setFilter(cat)}
-            className={`px-4 py-2 rounded-full border ${filter === cat ? "bg-pink-500 text-white" : "bg-white"}`}
+            className={`px-4 py-2 rounded-full border ${filter === cat ? "bg-black text-white" : "bg-white"}`}
           >
             {cat}
           </button>
@@ -95,7 +95,7 @@ function Receipts() {
             <h2 className="font-semibold">{item.name}</h2>
             <p className="text-gray-600">₹{item.price}</p>
             <div className="flex gap-2">
-              <button onClick={() => addItem(item)} className="px-3 py-1 bg-pink-500 text-white rounded">Add</button>
+              <button onClick={() => addItem(item)} className="px-3 py-1 bg-black text-white rounded">Add</button>
             </div>
           </div>
         ))}
@@ -167,7 +167,7 @@ function Receipts() {
 
               <div className="flex gap-3 justify-end mt-4">
                 <button type="button" onClick={() => setShowPayment(false)} className="px-4 py-2 rounded border">Cancel</button>
-                <button type="submit" className="px-4 py-2 rounded bg-blue-600 text-white">Pay & Print</button>
+                <button type="submit" className="px-4 py-2 rounded bg-black text-white">Pay & Print</button>
               </div>
             </form>
           </div>
