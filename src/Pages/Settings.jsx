@@ -1,8 +1,10 @@
 // src/Pages/Settings.jsx
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+const API = "http://localhost:5000/api/settings";
 
 export default function SettingsPage() {
-  // Load stored settings from localStorage
   const [settings, setSettings] = useState({
     restaurantName: "",
     address: "",
@@ -13,23 +15,33 @@ export default function SettingsPage() {
     printerSize: "58mm",
   });
 
-  // Load saved settings
+  // Load settings from backend
   useEffect(() => {
-    const saved = localStorage.getItem("pos-settings");
-    if (saved) {
-      setSettings(JSON.parse(saved));
-    }
+    fetchSettings();
   }, []);
 
-  // Update handler
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get(API);
+      if (res.data) {
+        setSettings(res.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch settings", err);
+    }
+  };
+
   const update = (key, value) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
-  // Save handler
-  const saveSettings = () => {
-    localStorage.setItem("pos-settings", JSON.stringify(settings));
-    alert("Settings saved successfully!");
+  const saveSettings = async () => {
+    try {
+      await axios.post(API, settings);
+      alert("Settings saved to server!");
+    } catch (err) {
+      alert("Failed to save settings!");
+    }
   };
 
   return (
