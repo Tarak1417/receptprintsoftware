@@ -1,31 +1,28 @@
-const express = require("express");
-const cors = require("cors");
 require("dotenv").config();
+const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const path = require("path");
-
-// Import Routes
-const recipeRoutes=require("./routes/recepi")
+const fs = require("fs");
 
 const app = express();
 
-// Middleware
+// Ensure uploads folder exists
+const uploadDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+
 app.use(cors());
 app.use(express.json());
-
-// Serve uploaded images as static files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads", express.static(uploadDir));
 
 // Routes
+const recipeRoutes = require("./routes/recepi");
 app.use("/api/recipe-items", recipeRoutes);
 
-// Database connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected successfully"))
-  .catch((err) => console.log("Error connecting to MongoDB:", err));
+// MongoDB Connect
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch(err => console.error("MongoDB error:", err));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -15,10 +15,10 @@ function Receipts() {
 
   const navigate = useNavigate();
 
-  // 👉 Fetch menu items from backend API
+  // Fetch menu items
   useEffect(() => {
     axios
-      .get("http://localhost:5000/Items")
+      .get("http://localhost:5000/api/recipe-items")
       .then((res) => setMenuItems(res.data))
       .catch((err) => console.log("Error fetching menu:", err));
   }, []);
@@ -31,24 +31,24 @@ function Receipts() {
 
   const addItem = (item) => {
     setReceipt((prev) => {
-      const ex = prev.find((p) => p.id === item.id);
+      const ex = prev.find((p) => p._id === item._id);
       if (ex)
         return prev.map((p) =>
-          p.id === item.id ? { ...p, qty: p.qty + 1 } : p
+          p._id === item._id ? { ...p, qty: p.qty + 1 } : p
         );
       return [...prev, { ...item, qty: 1 }];
     });
   };
 
-  const decreaseItem = (id) => {
+  const decreaseItem = (_id) => {
     setReceipt((prev) =>
       prev
-        .map((i) => (i.id === id ? { ...i, qty: i.qty - 1 } : i))
+        .map((i) => (i._id === _id ? { ...i, qty: i.qty - 1 } : i))
         .filter((i) => i.qty > 0)
     );
   };
 
-  const deleteItem = (id) => setReceipt((prev) => prev.filter((i) => i.id !== id));
+  const deleteItem = (_id) => setReceipt((prev) => prev.filter((i) => i._id !== _id));
 
   const totalQty = receipt.reduce((s, i) => s + i.qty, 0);
   const subTotal = receipt.reduce((s, i) => s + i.qty * i.price, 0);
@@ -66,23 +66,14 @@ function Receipts() {
 
   const onPaySubmit = (e) => {
     e.preventDefault();
-
     const payload = {
-      restaurant: {
-        name: "ALANKAR",
-        address: "123 MG Road, YourCity - 500001",
-        gst: "29ABCDE1234F2Z5",
-      },
-      customer: {
-        name: customerName || "Walk-in",
-        phone: customerPhone || "",
-      },
+      restaurant: { name: "ALANKAR", address: "123 MG Road", gst: "29ABCDE1234F2Z5" },
+      customer: { name: customerName || "Walk-in", phone: customerPhone || "" },
       payment: { method: paymentMethod },
       items: receipt,
       totals: { totalQty, subTotal, gstAmount, grandTotal, gstPercent: GST_PERCENT },
       date: new Date().toISOString(),
     };
-
     navigate("/print", { state: payload });
   };
 
@@ -112,11 +103,11 @@ function Receipts() {
         ) : (
           filteredItems.map((item) => (
             <div
-              key={item.id}
+              key={item._id} // ✅ Use _id from MongoDB
               className="bg-white shadow-md rounded-xl p-3 space-y-2"
             >
               <img
-                src={item.image}
+                src={`http://localhost:5000${item.image}`} // ✅ Fix image URL
                 alt={item.name}
                 className="w-full h-32 object-cover rounded-lg"
               />
@@ -143,7 +134,7 @@ function Receipts() {
           <div className="space-y-3">
             {receipt.map((item) => (
               <div
-                key={item.id}
+                key={item._id} // ✅ Use _id
                 className="flex justify-between items-center border-b pb-3"
               >
                 <div>
@@ -155,7 +146,7 @@ function Receipts() {
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => decreaseItem(item.id)}
+                    onClick={() => decreaseItem(item._id)}
                     className="px-2 py-1 bg-gray-200 rounded"
                   >
                     -
@@ -168,7 +159,7 @@ function Receipts() {
                     +
                   </button>
                   <button
-                    onClick={() => deleteItem(item.id)}
+                    onClick={() => deleteItem(item._id)}
                     className="ml-3 px-3 py-1 bg-red-500 text-white rounded"
                   >
                     Delete
@@ -204,9 +195,7 @@ function Receipts() {
                 Charge
               </button>
               <button
-                onClick={() => {
-                  setReceipt([]);
-                }}
+                onClick={() => setReceipt([])}
                 className="bg-gray-200 px-4 py-2 rounded"
               >
                 Clear
@@ -279,4 +268,5 @@ function Receipts() {
     </div>
   );
 }
+
 export default Receipts;
